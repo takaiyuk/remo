@@ -18,7 +18,10 @@ def get_sheet_client(sheet_filename: str, secret_json_path: Path) -> Worksheet:
     return sheet
 
 
-def write_sheet(sheet_client: Worksheet, device_temperature: DeviceTemperature, verbose: bool = True) -> None:
+def write_sheet(
+    env_dict: dict[str, str], device_temperature: DeviceTemperature, verbose: bool = True
+) -> None:
+    sheet_client = get_sheet_client(env_dict["SHEET_FILENAME"], Path(env_dict["SECRET_JSON_PATH"]))
     row = [device_temperature.val, device_temperature.created_at.strftime("%Y-%m-%dT%H:%M:%S")]
     index = len(sheet_client.get_all_values()) + 1
     sheet_client.insert_row(row, index)

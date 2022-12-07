@@ -1,4 +1,5 @@
 # Custom
+.ecr-env
 client-secret.json
 
 # Byte-compiled / optimized / DLL files
