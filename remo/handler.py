@@ -15,8 +15,6 @@ def main():
             "DEVICE_NAME": os.getenv("DEVICE_NAME"),
             "SHEET_FILENAME": os.getenv("SHEET_FILENAME"),
             "SECRET_JSON_PATH": os.getenv("SECRET_JSON_PATH"),
-            "AWS_SECRET_JSON_PATH_BUCKET": os.getenv("AWS_SECRET_JSON_PATH_BUCKET"),
-            "AWS_SECRET_JSON_PATH_KEY": os.getenv("AWS_SECRET_JSON_PATH_KEY"),
         }
     else:
         env_dict = read_env(Path(".env"))
