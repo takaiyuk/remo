@@ -40,7 +40,7 @@ def is_temperature_updated(sheet_client: Worksheet, device_temperature: DeviceTe
 
 def write_sheet(
     env_dict: dict[str, str], device_temperature: DeviceTemperature, verbose: bool = True
-) -> None:
+) -> bool:
     sheet_client = get_sheet_client(env_dict["SHEET_FILENAME"], Path(env_dict["SECRET_JSON_PATH"]))
     if is_temperature_updated(sheet_client, device_temperature):
         row = [device_temperature.val, format_datetime(device_temperature.created_at)]
@@ -48,5 +48,7 @@ def write_sheet(
         sheet_client.insert_row(row, index)
         if verbose:
             logger.info(f"Insert row: {row}")
+        return True
     else:
         logger.info("Temperature is not updated")
+        return False
