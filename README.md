@@ -10,9 +10,9 @@
 
 ## Execution
 
-```
+```shell
 $ poetry install
-$ poetry run python main.py
+$ poetry run invoke run
 ```
 
 ## Resources

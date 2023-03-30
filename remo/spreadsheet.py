@@ -1,5 +1,6 @@
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 import gspread
 import structlog
@@ -15,7 +16,9 @@ def format_datetime(dt: datetime) -> str:
     return dt.strftime("%Y-%m-%dT%H:%M:%S")
 
 
-def get_sheet_client(sheet_filename: str, secret_json_path: Path) -> Worksheet:
+def get_sheet_client(sheet_filename: Optional[str], secret_json_path: Optional[Path]) -> Optional[Worksheet]:
+    if sheet_filename is None or secret_json_path is None:
+        return None
     # use creds to create a client to interact with the Google Drive API
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     creds = ServiceAccountCredentials.from_json_keyfile_name(secret_json_path, scope)
@@ -41,7 +44,16 @@ def is_temperature_updated(sheet_client: Worksheet, device_temperature: DeviceTe
 def write_sheet(
     env_dict: dict[str, str], device_temperature: DeviceTemperature, verbose: bool = True
 ) -> bool:
-    sheet_client = get_sheet_client(env_dict["SHEET_FILENAME"], Path(env_dict["SECRET_JSON_PATH"]))
+    sheet_filename = env_dict["SHEET_FILENAME"]
+    secret_json_path = Path(env_dict["SECRET_JSON_PATH"])
+    sheet_client = get_sheet_client(sheet_filename, secret_json_path)
+    if sheet_client is None:
+        if verbose:
+            if sheet_filename is None:
+                logger.info("SHEET_FILENAME is not found")
+            if secret_json_path is None:
+                logger.info("SECRET_JSON_PATH is not found")
+        return False
     if is_temperature_updated(sheet_client, device_temperature):
         row = [device_temperature.val, format_datetime(device_temperature.created_at)]
         index = len(sheet_client.get_all_values()) + 1
@@ -50,5 +62,6 @@ def write_sheet(
             logger.info(f"Insert row: {row}")
         return True
     else:
-        logger.info("Temperature is not updated")
+        if verbose:
+            logger.info("Temperature is not updated")
         return False

@@ -24,6 +24,8 @@ def main():
     else:
         env_dict = read_env(Path(".env"))
     device_temperature = get_device_temperature(env_dict["TOKEN"], env_dict["DEVICE_NAME"])
+    if device_temperature is None:
+        return
     is_written = write_sheet(env_dict, device_temperature, verbose=True)
     if is_written:
         slack_client = SlackClient(
